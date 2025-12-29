@@ -1,0 +1,22 @@
+spring:
+  application:
+    name: banking-faturas-batch
+
+  datasource:
+    url: jdbc:mysql://localhost:3306/banking_api
+    username: root  # Confirme seu usuário
+    password: root  # Confirme sua senha
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+  data:
+    mongodb:
+      uri: mongodb://admin:admin@localhost:27017/banking_faturas?authSource=admin
+
+  batch:
+    jdbc:
+      initialize-schema: always
+    job:
+      enabled: false
+
+  jpa:
+    show-sql: false
