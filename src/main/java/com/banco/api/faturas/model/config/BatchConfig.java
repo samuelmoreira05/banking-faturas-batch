@@ -19,7 +19,7 @@ import java.time.LocalDateTime;
 public class BatchConfig {
 
     @Bean
-    public JdbcCursorItemReader<FaturaDTO> faturaReader (DataSource dataSource){
+    public JdbcCursorItemReader<FaturaDTO> faturaReader (DataSource dataSource){ // ESTA TRAZENDO OS DADOS AGRUPADOS DO MYSQL
         return new JdbcCursorItemReaderBuilder<FaturaDTO>()
                 .name("faturaReader")
                 .dataSource(dataSource)
@@ -30,7 +30,7 @@ public class BatchConfig {
     }
 
     @Bean
-    public ItemProcessor<FaturaDTO, Fatura> faturaProcessor(){
+    public ItemProcessor<FaturaDTO, Fatura> faturaProcessor(){ //TRANSFORMA O DTO EM FATURA
         return dto -> {
             return Fatura.builder()
                     .contaId(dto.contaId())
@@ -44,7 +44,7 @@ public class BatchConfig {
     }
 
     @Bean
-    public MongoItemWriter<Fatura> faturaWriter(MongoTemplate mongoTemplate){
+    public MongoItemWriter<Fatura> faturaWriter(MongoTemplate mongoTemplate){ //SALVA NO MONGO
         return new MongoItemWriterBuilder<Fatura>()
                 .template(mongoTemplate)
                 .collection("faturas")
