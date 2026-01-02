@@ -1,11 +1,13 @@
 package com.banco.api.faturas.controller;
 
+import com.banco.api.faturas.model.dto.RequisicaoFaturaDTO;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.JobParametersBuilder;
 import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -22,9 +24,14 @@ public class FaturaJobController {
     }
 
     @PostMapping("/gerar")
-    public ResponseEntity<String> gerarFaturas() {
+    public ResponseEntity<String> gerarFaturas(@RequestBody RequisicaoFaturaDTO dados) {
         try {
+            System.out.printf("Pedido recebido do core: Mês " + dados.mes() + "/" + dados.ano());
+
             JobParameters jobParameters = new JobParametersBuilder()
+                    .addString("requestId", dados.requestId())
+                    .addLong("ano", (long) dados.ano())
+                    .addLong("mes", (long) dados.mes())
                     .addLong("inicio", System.currentTimeMillis())
                     .toJobParameters();
 
