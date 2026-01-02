@@ -2,8 +2,10 @@ package com.banco.api.faturas.model.config;
 
 import com.banco.api.faturas.model.Fatura;
 import com.banco.api.faturas.model.dto.FaturaDTO;
+import com.banco.api.faturas.processor.FaturaProcessor;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
+import org.springframework.batch.core.configuration.annotation.StepScope;
 import org.springframework.batch.core.job.builder.JobBuilder;
 import org.springframework.batch.core.launch.support.RunIdIncrementer;
 import org.springframework.batch.core.repository.JobRepository;
@@ -13,6 +15,7 @@ import org.springframework.batch.item.data.MongoItemWriter;
 import org.springframework.batch.item.data.builder.MongoItemWriterBuilder;
 import org.springframework.batch.item.database.JdbcCursorItemReader;
 import org.springframework.batch.item.database.builder.JdbcCursorItemReaderBuilder;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.mongodb.core.MongoTemplate;
@@ -26,11 +29,22 @@ import java.time.LocalDateTime;
 public class BatchConfig {
 
     @Bean
-    public JdbcCursorItemReader<FaturaDTO> faturaReader (DataSource dataSource){ // ESTA TRAZENDO OS DADOS AGRUPADOS DO MYSQL
+    @StepScope
+    public JdbcCursorItemReader<FaturaDTO> faturaReader (
+            DataSource dataSource,
+            @Value("#{jobParameters['mes']}") Integer mes,
+            @Value("#{jobParameters['ano']}") Integer ano){ // ESTA TRAZENDO OS DADOS AGRUPADOS DO MYSQL
+
+        String sql = String.format(
+                "SELECT conta_id, SUM(valor) as total FROM transacoes " +
+                 "WHERE MONTH(data_transacao) = %d AND YEAR(data_transacao) = %d " +
+                 "GROUP BY conta_id", mes, ano
+        );
+
         return new JdbcCursorItemReaderBuilder<FaturaDTO>()
                 .name("faturaReader")
                 .dataSource(dataSource)
-                .sql("SELECT conta_id, SUM(valor) as total FROM transacoes GROUP BY conta_id")
+                .sql(sql)
                 .rowMapper(new DataClassRowMapper<>(FaturaDTO.class))
                 .build();
 
@@ -62,7 +76,7 @@ public class BatchConfig {
     public Step faturaStep(JobRepository jobRepository,
                            PlatformTransactionManager transactionManager,
                            JdbcCursorItemReader<FaturaDTO> reader,
-                           ItemProcessor<FaturaDTO, Fatura> processor,
+                           FaturaProcessor processor,
                            MongoItemWriter<Fatura> writer){
 
         return new StepBuilder("faturaStep", jobRepository)
