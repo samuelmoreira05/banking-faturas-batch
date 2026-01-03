@@ -4,8 +4,8 @@ spring:
 
   datasource:
     url: jdbc:mysql://localhost:3306/banking_api
-    username: root  # Confirme seu usuário
-    password: root  # Confirme sua senha
+    username: root
+    password: root
     driver-class-name: com.mysql.cj.jdbc.Driver
 
   data:

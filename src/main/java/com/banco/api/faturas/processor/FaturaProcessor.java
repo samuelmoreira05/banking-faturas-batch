@@ -1,5 +1,6 @@
 package com.banco.api.faturas.processor;
 
+import com.banco.api.faturas.enums.StatusFatura;
 import com.banco.api.faturas.model.Fatura;
 import com.banco.api.faturas.model.dto.FaturaDTO;
 import org.springframework.batch.core.configuration.annotation.StepScope;
@@ -10,7 +11,7 @@ import org.springframework.stereotype.Component;
 import java.time.LocalDateTime;
 
 @Component
-@StepScope // <- Pega os parametros dinamicos
+@StepScope
 public class FaturaProcessor implements ItemProcessor<FaturaDTO, Fatura> {
 
     @Value("#{jobParameters['requestId']}")
@@ -28,7 +29,7 @@ public class FaturaProcessor implements ItemProcessor<FaturaDTO, Fatura> {
                 .contaId(item.contaId())
                 .valorTotal(item.total())
                 .dataCriacao(LocalDateTime.now())
-                .status("GERADA")
+                .status(StatusFatura.FECHADA.name())
                 .mes(mes.intValue())
                 .ano(ano.intValue())
                 .requestId(requestId)
