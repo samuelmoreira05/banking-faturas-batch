@@ -1,8 +1,8 @@
-package com.banco.api.reader;
+package com.banco.api.faturas.reader;
 
 import com.banco.api.faturas.model.dto.FaturaDTO;
 import org.springframework.batch.core.configuration.annotation.StepScope;
-import org.springframework.batch.item.database.JdbcCursorItemReader;
+import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.database.builder.JdbcCursorItemReaderBuilder;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -14,9 +14,9 @@ import javax.sql.DataSource;
 @Configuration
 public class FaturaReader {
 
-    @Bean
+    @Bean("faturaReaderBean")
     @StepScope
-    public JdbcCursorItemReader<FaturaDTO> reader(
+    public ItemReader<FaturaDTO> reader(
             DataSource dataSource,
             @Value("#{jobParameters['mes']}") Integer mes,
             @Value("#{jobParameters['ano']}") Integer ano) {
